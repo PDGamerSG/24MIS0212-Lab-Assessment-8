@@ -15,11 +15,11 @@ spec:
         app: noticeboard
     spec:
       containers:
-      - name: noticeboard-app
-        image: pdgamersg/noticeboard-app:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
+        - name: noticeboard-app
+          image: pdgamersg/noticeboard-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
 
 ---
 apiVersion: v1

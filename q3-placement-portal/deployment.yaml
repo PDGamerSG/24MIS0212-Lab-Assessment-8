@@ -15,11 +15,11 @@ spec:
         app: placement-portal
     spec:
       containers:
-      - name: placement-container
-        image: pdgamersg/placement-portal:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
+        - name: placement-container
+          image: pdgamersg/placement-portal:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
 
 ---
 apiVersion: v1

@@ -2,18 +2,20 @@
 
 Repository: https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-8
 
-| Question | Code | Replicas | Local container test | Kubernetes NodePort |
-|---|---|---:|---|---|
-| 1 Notice board | q1-notice-board | 2 | http://localhost:8101 | http://localhost:30001 |
-| 2 Student feedback | q2-student-feedback | 3 | http://localhost:8102 | http://localhost:30002 |
-| 3 Placement portal | q3-placement-portal | 3 | http://localhost:8103 | http://localhost:30003 |
+| Question           | Code                | Replicas | Local container test  | Kubernetes NodePort    |
+| ------------------ | ------------------- | -------: | --------------------- | ---------------------- |
+| 1 Notice board     | q1-notice-board     |        2 | http://localhost:8101 | http://localhost:30001 |
+| 2 Student feedback | q2-student-feedback |        3 | http://localhost:8102 | http://localhost:30002 |
+| 3 Placement portal | q3-placement-portal |        3 | http://localhost:8103 | http://localhost:30003 |
 
-The three folders are projects inside this Git repository. Each contains index.html, Dockerfile, deployment.yaml, Jenkinsfile, test-config.json and README.md. The original root demo is retained.
+The three folders are projects inside this Git repository. Each contains index.html, Dockerfile, deployment.yaml, Jenkinsfile, test-config.json and README.md. Unused root demo files have been removed.
 
 ## Jenkins setup
+
 Jenkins: http://localhost:8085
-Use Pipeline from SCM, Git, this repository, branch */main, and the project's Jenkinsfile path.
+Use Pipeline from SCM, Git, this repository, branch \*/main, and the project's Jenkinsfile path.
 Existing credential IDs:
+
 - dockerhub: Docker Hub username/password; username pdgamersg, password a read/write access token.
 - kuberconfig: secret file, Docker Desktop kubeconfig. Never commit this file.
 
@@ -22,11 +24,14 @@ These pipelines run on this Windows Jenkins machine. Docker Desktop must be runn
 Docker Desktop uses a kind cluster on this machine. Small TCP-forwarding containers expose its real NodePorts on Windows localhost. They do not serve the HTML themselves. Their restart policy is no, as requested. Kubernetes system containers are managed by Docker Desktop.
 
 ## Tests
+
 Run: python ci/test_source.py
 Each Jenkins job runs ci/Test-Container.ps1 and ci/Test-Page.ps1, then ci/Deploy.ps1 checks replica counts and Running/Ready Pods. Browser checks and actual build/deployment results are saved in evidence/RESULTS.md.
 
 ## Updates
-Q2: index-v1.html preserves the initial version; index-v2.html adds a computed course rating summary and a thank-you message. Feedback stays in browser localStorage.
-Q3: index-v1.html has two companies; index-updated.html adds Google. Q3 polls GitHub every two minutes to detect pushed changes.
+
+Q2: the deployed index.html will add a computed course rating summary and a thank-you message. Feedback stays in browser localStorage.
+Q3: the deployed index.html will add Google. Q3 polls GitHub every two minutes to detect pushed changes.
+Initial versions are retained only in evidence/before/ to demonstrate the required updates.
 
 All notices, companies and contact details are academic sample data. These static apps do not send feedback to a backend or submit real job applications.

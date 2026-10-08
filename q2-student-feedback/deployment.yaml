@@ -15,11 +15,11 @@ spec:
         app: feedback-app
     spec:
       containers:
-      - name: feedback-container
-        image: pdgamersg/student-feedback:v1
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
+        - name: feedback-container
+          image: pdgamersg/student-feedback:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
 
 ---
 apiVersion: v1

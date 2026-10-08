@@ -1,7 +1,12 @@
 pipeline {
     agent any
-    options { disableConcurrentBuilds(); skipDefaultCheckout(); timeout(time: 20, unit: 'MINUTES'); buildDiscarder(logRotator(numToKeepStr: '10')) }
-    triggers { pollSCM('H/2 * * * *') }
+    options {
+        disableConcurrentBuilds()
+        skipDefaultCheckout()
+        timeout(time: 25, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    
     environment {
         DOCKER_IMAGE = 'pdgamersg/student-feedback'
         APP_DIR = 'q2-student-feedback'
@@ -11,7 +16,11 @@ pipeline {
     }
     stages {
         stage('Clone Code') {
-            steps { git branch: 'main', url: 'https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-8.git' }
+            steps {
+                retry(3) {
+                    git branch: 'main', url: 'https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-8.git'
+                }
+            }
         }
         stage('Build Docker Image') {
             steps { bat 'docker build -t %DOCKER_IMAGE%:%BUILD_NUMBER% -t %DOCKER_IMAGE%:latest %APP_DIR%' }
@@ -28,12 +37,16 @@ pipeline {
 echo %DOCKER_PASS%|docker login --username %DOCKER_USER% --password-stdin
 exit /b %ERRORLEVEL%
 '''
-                    bat '''@echo off
+                    retry(3) {
+                        timeout(time: 4, unit: 'MINUTES') {
+                            bat '''@echo off
 docker push %DOCKER_IMAGE%:%BUILD_NUMBER%
 if errorlevel 1 exit /b 1
 docker push %DOCKER_IMAGE%:latest
 exit /b %ERRORLEVEL%
 '''
+                        }
+                    }
                 }
             }
         }
