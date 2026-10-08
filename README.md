@@ -30,7 +30,7 @@ Each Jenkins job runs ci/Test-Container.ps1 and ci/Test-Page.ps1, then ci/Deploy
 
 ## Updates
 
-Q2: the deployed index.html will add a computed course rating summary and a thank-you message. Feedback stays in browser localStorage.
+Q2: the deployed index.html adds a computed course rating summary and a thank-you message. Feedback stays in browser localStorage.
 Q3: the deployed index.html will add Google. Q3 polls GitHub every two minutes to detect pushed changes.
 Initial versions are retained only in evidence/before/ to demonstrate the required updates.
 

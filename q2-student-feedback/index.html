@@ -119,6 +119,10 @@
         <button type="submit">Submit Feedback</button>
       </form>
       <p id="status" role="status" aria-live="polite"></p>
+      <section aria-labelledby="summaryHeading">
+        <h2 id="summaryHeading">Course rating summary</h2>
+        <p id="ratingSummary" aria-live="polite"></p>
+      </section>
       <footer>
         <strong>Contact:</strong> Department office &middot;
         <a href="mailto:scope@example.com">scope@example.com</a>
@@ -141,7 +145,22 @@
       } catch {
         storageAvailable = false;
       }
-
+      function showSummary() {
+        const summary = document.getElementById("ratingSummary");
+        if (!feedback.length) {
+          summary.textContent = "No feedback yet in this browser.";
+          return;
+        }
+        const average =
+          feedback.reduce((total, item) => total + Number(item.rating), 0) /
+          feedback.length;
+        summary.textContent =
+          feedback.length +
+          " response(s) in this browser. Average course rating: " +
+          average.toFixed(1) +
+          "/5.";
+      }
+      showSummary();
       document
         .getElementById("feedbackForm")
         .addEventListener("submit", function (event) {
@@ -161,8 +180,9 @@
           }
           feedback = next;
           document.getElementById("status").textContent =
-            "Feedback saved in this browser.";
+            "Thank you! Your feedback has been saved in this browser.";
           this.reset();
+          showSummary();
         });
     </script>
   </body>
