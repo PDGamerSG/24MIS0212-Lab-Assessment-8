@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Feedback Portal</title>
+    <style>
+        :root {
+            --primary-color: #0d9488;
+            --primary-dark: #0f766e;
+            --bg-color: #f0fdf4;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        form {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .rating-group {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            padding-top: 0.5rem;
+        }
+
+        .rating-option {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Student Course Feedback System</h1>
+            <p>Help us improve your learning experience by providing feedback</p>
+        </div>
+
+        <form onsubmit="alert('Feedback Submitted Successfully!'); return false;">
+            <div class="row">
+                <div class="form-group">
+                    <label for="studentName">Student Name</label>
+                    <input type="text" id="studentName" placeholder="e.g. Pallab Das" required>
+                </div>
+                <div class="form-group">
+                    <label for="regNo">Register Number</label>
+                    <input type="text" id="regNo" placeholder="e.g. 24MIS0212" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" required>
+                        <option value="">Select Department</option>
+                        <option value="SCOPE">SCOPE (Computer Science)</option>
+                        <option value="SENSE">SENSE (Electronics)</option>
+                        <option value="SELECT">SELECT (Electrical)</option>
+                        <option value="SMEC">SMEC (Mechanical)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="courseName">Course Name</label>
+                    <input type="text" id="courseName" placeholder="e.g. Agile Software Development" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="facultyName">Faculty Name</label>
+                <input type="text" id="facultyName" placeholder="e.g. Dr. A. Professor" required>
+            </div>
+
+            <div class="form-group">
+                <label>Overall Course Rating (1 to 5 Stars)</label>
+                <div class="rating-group">
+                    <label class="rating-option"><input type="radio" name="rating" value="1" required> 1 ★</label>
+                    <label class="rating-option"><input type="radio" name="rating" value="2"> 2 ★★</label>
+                    <label class="rating-option"><input type="radio" name="rating" value="3"> 3 ★★★</label>
+                    <label class="rating-option"><input type="radio" name="rating" value="4"> 4 ★★★★</label>
+                    <label class="rating-option"><input type="radio" name="rating" value="5" checked> 5 ★★★★★</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="comments">Detailed Feedback / Comments</label>
+                <textarea id="comments" rows="4" placeholder="Share your experience, lecture quality, lab infrastructure, etc..." required></textarea>
+            </div>
+
+            <button type="submit">Submit Feedback</button>
+        </form>
+
+        <footer>
+            Version 1.0.0 | Deployed with Docker & Kubernetes
+        </footer>
+    </div>
+
+</body>
+</html>

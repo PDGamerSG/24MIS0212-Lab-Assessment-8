@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Placement Portal | VIT SCOPE (Updated)</title>
+    <style>
+        :root {
+            --primary: #1e1b4b;
+            --accent: #4f46e5;
+            --accent-light: #6366f1;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --salary-badge: #dcfce7;
+            --salary-text: #15803d;
+            --new-badge: #fef3c7;
+            --new-text: #b45309;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        nav .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        nav .logo p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .status-pill {
+            background: #22c55e;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #312e81 0%, #4f46e5 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .update-tag {
+            background: var(--new-badge);
+            color: var(--new-text);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .job-card.featured {
+            border-left: 5px solid #059669;
+        }
+
+        .job-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -3px rgba(0,0,0,0.1);
+        }
+
+        .company-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .company-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .job-role {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 0.2rem;
+        }
+
+        .salary-badge {
+            background: var(--salary-badge);
+            color: var(--salary-text);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        .job-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin: 1.2rem 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .detail-row strong {
+            color: var(--text-dark);
+            min-width: 120px;
+        }
+
+        .apply-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .apply-btn:hover {
+            background: var(--accent-light);
+        }
+
+        .contact-section {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-top: 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .contact-box h4 {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .contact-box p {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        footer {
+            background: var(--primary);
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <h1>VIT Placement Cell</h1>
+            <p>School of Computer Science & Engineering (SCOPE)</p>
+        </div>
+        <span class="status-pill">● Placement Season 2026 Active</span>
+    </nav>
+
+    <div class="hero">
+        <h2>Campus Placement & Career Opportunities</h2>
+        <p>Explore top tier corporate job roles, eligibility criteria, and CTC packages</p>
+    </div>
+
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-title">🚀 Active Campus Recruitment Drives</h3>
+            <span class="update-tag">🔥 Updated via Automated CI/CD Pipeline</span>
+        </div>
+
+        <div class="jobs-grid" id="jobsContainer">
+            <!-- NEWLY ADDED COMPANY DRIVE (Google) -->
+            <div class="job-card featured">
+                <div>
+                    <div class="company-header">
+                        <div>
+                            <div class="company-name">Google</div>
+                            <div class="job-role">Software Engineering Intern / FTE</div>
+                        </div>
+                        <span class="salary-badge">₹ 52.0 LPA</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-row">
+                            <strong>Eligibility:</strong> B.Tech/M.Tech CSE, No Standing Arrears
+                        </div>
+                        <div class="detail-row">
+                            <strong>Location:</strong> Bengaluru / Gurgaon
+                        </div>
+                        <div class="detail-row">
+                            <strong>Deadline:</strong> 📅 November 05, 2026
+                        </div>
+                    </div>
+                </div>
+                <button class="apply-btn" style="background:#059669;" onclick="alert('Application submitted for Google SDE!');">Apply Now (Newly Added)</button>
+            </div>
+
+            <!-- Job Drive 1 -->
+            <div class="job-card">
+                <div>
+                    <div class="company-header">
+                        <div>
+                            <div class="company-name">Microsoft</div>
+                            <div class="job-role">Software Development Engineer (SDE-1)</div>
+                        </div>
+                        <span class="salary-badge">₹ 45.0 LPA</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-row">
+                            <strong>Eligibility:</strong> B.Tech/M.Tech CSE, CGPA >= 8.5
+                        </div>
+                        <div class="detail-row">
+                            <strong>Location:</strong> Bengaluru / Hyderabad
+                        </div>
+                        <div class="detail-row">
+                            <strong>Deadline:</strong> 📅 October 25, 2026
+                        </div>
+                    </div>
+                </div>
+                <button class="apply-btn" onclick="alert('Application submitted for Microsoft SDE-1!');">Apply Now</button>
+            </div>
+
+            <!-- Job Drive 2 -->
+            <div class="job-card">
+                <div>
+                    <div class="company-header">
+                        <div>
+                            <div class="company-name">Amazon AWS</div>
+                            <div class="job-role">Cloud & DevOps Engineer</div>
+                        </div>
+                        <span class="salary-badge">₹ 32.0 LPA</span>
+                    </div>
+                    <div class="job-details">
+                        <div class="detail-row">
+                            <strong>Eligibility:</strong> M.Tech CSE/SE, Knowledge of K8s & Docker
+                        </div>
+                        <div class="detail-row">
+                            <strong>Location:</strong> Chennai / Remote
+                        </div>
+                        <div class="detail-row">
+                            <strong>Deadline:</strong> 📅 October 28, 2026
+                        </div>
+                    </div>
+                </div>
+                <button class="apply-btn" onclick="alert('Application submitted for Amazon Cloud Engineer!');">Apply Now</button>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <div class="contact-box">
+                <h4>Placement Officer</h4>
+                <p>Dr. P. Placement Director</p>
+            </div>
+            <div class="contact-box">
+                <h4>Official Email</h4>
+                <p>placements.scope@vit.ac.in</p>
+            </div>
+            <div class="contact-box">
+                <h4>Helpline Desk</h4>
+                <p>+91 (0416) 220-3040</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Office of Career Development | Deployed automatically via Jenkins CI/CD, Docker & Kubernetes
+    </footer>
+
+</body>
+</html>

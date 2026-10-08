@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = 'pdgamersg/student-feedback'
+        IMAGE_TAG = 'v1' // Set to 'v2' when updating application
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+    }
+
+    stages {
+        stage('Checkout Source Code') {
+            steps {
+                echo 'Cloning code from repository...'
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('q2-student-feedback') {
+                    echo "Building Docker Image: ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                }
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                echo 'Testing Docker container...'
+                sh "docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} nginx -t"
+            }
+        }
+
+        stage('Push Image to Docker Hub') {
+            steps {
+                echo 'Pushing image to Docker Hub...'
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Deploy / Rolling Update to Kubernetes') {
+            steps {
+                echo 'Applying Deployment with 3 Replicas...'
+                dir('q2-student-feedback') {
+                    sh 'kubectl apply -f deployment.yaml'
+                    sh "kubectl set image deployment/feedback-deployment feedback-container=${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Verify 3 Replicas Status') {
+            steps {
+                echo 'Verifying deployment rollout status and 3 running pods...'
+                sh 'kubectl rollout status deployment/feedback-deployment'
+                sh 'kubectl get pods -l app=feedback-app'
+                sh 'kubectl get svc feedback-service'
+            }
+        }
+    }
+}

@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'pdgamersg/noticeboard-app:latest'
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+        KUBECONFIG_CREDENTIALS_ID = 'kubeconfig-credentials'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking out code from Git repository...'
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('q1-notice-board') {
+                    echo 'Building Docker Image...'
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                }
+            }
+        }
+
+        stage('Test Local Container') {
+            steps {
+                echo 'Verifying Docker Container Build...'
+                sh 'docker run --rm ${DOCKER_IMAGE} nginx -t'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                echo 'Authenticating and Pushing Image to Docker Hub...'
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker push ${DOCKER_IMAGE}'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo 'Deploying application to Kubernetes Cluster...'
+                dir('q1-notice-board') {
+                    sh 'kubectl apply -f deployment.yaml'
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                echo 'Verifying Kubernetes Pods and NodePort Service...'
+                sh 'kubectl rollout status deployment/noticeboard-deployment'
+                sh 'kubectl get pods -l app=noticeboard'
+                sh 'kubectl get svc noticeboard-service'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution complete.'
+        }
+    }
+}
