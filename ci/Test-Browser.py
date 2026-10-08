@@ -18,9 +18,9 @@ with sync_playwright() as playwright:
     page = browser.new_page()
     for width in [1280, 375]:
         page.set_viewport_size({"width": width, "height": 900})
-        page.goto(f"http://localhost:{30000 + args.question}", wait_until="networkidle")
         page_errors = []
         page.on("pageerror", lambda error: page_errors.append(str(error)))
+        page.goto(f"http://localhost:{30000 + args.question}", wait_until="networkidle")
         result = page.evaluate("async () => {" + script + "; return await runAssessmentBrowserTests(); }")
         assert not page_errors, page_errors
         result["version"] = args.version
@@ -31,6 +31,24 @@ with sync_playwright() as playwright:
             summary = page.locator("#ratingSummary")
             if summary.count():
                 assert "No feedback yet" in summary.inner_text()
+                for field, value in {
+                    "courseName": "Agile Development",
+                    "facultyName": "Demo Faculty",
+                    "studentName": "Test Student",
+                    "regNo": "TEST002",
+                    "comments": "Persistence test",
+                }.items():
+                    page.locator("#" + field).fill(value)
+                page.locator("#department").select_option(label="SCOPE")
+                page.locator('input[name="rating"][value="4"]').check()
+                page.get_by_role("button", name="Submit Feedback").click()
+                assert "1 response(s)" in summary.inner_text()
+                assert "4.0/5" in summary.inner_text()
+                page.reload(wait_until="networkidle")
+                assert "4.0/5" in page.locator("#ratingSummary").inner_text()
+                result["results"].append("PASS: Rating calculation and persistence after reload")
+                page.evaluate("localStorage.removeItem('assessment8-feedback')")
+                page.reload(wait_until="networkidle")
         page.screenshot(path=str(output / f"q{args.question}-{args.version}-{width}.png"), full_page=True)
         print(f"PASS Q{args.question} {args.version} at {width}px: {len(result['results'])} functional checks")
     browser.close()

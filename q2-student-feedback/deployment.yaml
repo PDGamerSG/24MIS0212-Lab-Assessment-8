@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: feedback-container
-          image: pdgamersg/student-feedback:v1
+          image: pdgamersg/student-feedback:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

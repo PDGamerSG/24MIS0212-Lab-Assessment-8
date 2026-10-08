@@ -13,7 +13,9 @@ The three folders are projects inside this Git repository. Each contains index.h
 ## Jenkins setup
 
 Jenkins: http://localhost:8085
-Use Pipeline from SCM, Git, this repository, branch \*/main, and the project's Jenkinsfile path.
+The configured jobs use Pipeline scripts from the project's Jenkinsfile, with an explicit GitHub clone stage.
+For another Jenkins installation, either copy the project's Jenkinsfile into a Pipeline job or use Pipeline from SCM with this repository, branch main, and the project's Jenkinsfile path.
+The existing "k8s test" job runs all three question jobs using the root Jenkinsfile.
 Existing credential IDs:
 
 - dockerhub: Docker Hub username/password; username pdgamersg, password a read/write access token.
@@ -27,6 +29,11 @@ Docker Desktop uses a kind cluster on this machine. Small TCP-forwarding contain
 
 Run: python ci/test_source.py
 Each Jenkins job runs ci/Test-Container.ps1 and ci/Test-Page.ps1, then ci/Deploy.ps1 checks replica counts and Running/Ready Pods. Browser checks and actual build/deployment results are saved in evidence/RESULTS.md.
+
+Browser tests: python ci/Test-Browser.py --question 1 --version final (repeat with questions 2 and 3).
+They check both desktop and mobile layouts; Q2 also checks validation, saving, rating calculation and persistence.
+These tests use Playwright: pip install playwright, then python -m playwright install chromium.
+Generated logs and screenshots remain in this folder and are excluded from Git; the two initial HTML pages in evidence/before are tracked for the update demonstration.
 
 ## Updates
 

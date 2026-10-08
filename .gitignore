@@ -2,3 +2,9 @@
 *.tar
 __pycache__/
 evidence/screenshots/
+evidence/builds/
+evidence/browser/
+evidence/*.json
+evidence/*.log
+evidence/*.txt
+evidence/RESULTS.md
