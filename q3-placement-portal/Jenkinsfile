@@ -1,78 +1,55 @@
 pipeline {
     agent any
-
+    options { disableConcurrentBuilds(); skipDefaultCheckout(); timeout(time: 20, unit: 'MINUTES'); buildDiscarder(logRotator(numToKeepStr: '10')) }
+    triggers { pollSCM('H/2 * * * *') }
     environment {
-        DOCKER_HUB_REPO = 'pdgamersg/placement-portal'
-        IMAGE_TAG = 'latest'
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+        DOCKER_IMAGE = 'pdgamersg/placement-portal'
+        APP_DIR = 'q3-placement-portal'
+        DOCKER_HOST = 'npipe:////./pipe/dockerDesktopLinuxEngine'
+        DOCKER_CONFIG = "${WORKSPACE}\\.docker-build-${BUILD_NUMBER}"
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\Git\\cmd;${env.PATH}"
     }
-
     stages {
-        // Stage 1: Clone Code
-        stage('Stage 1: Clone Code') {
+        stage('Clone Code') {
+            steps { git branch: 'main', url: 'https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-8.git' }
+        }
+        stage('Build Docker Image') {
+            steps { bat 'docker build -t %DOCKER_IMAGE%:%BUILD_NUMBER% -t %DOCKER_IMAGE%:latest %APP_DIR%' }
+        }
+        stage('Test Application') {
             steps {
-                echo '=== STAGE 1: Cloning repository code from GitHub ==='
-                checkout scm
+                bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Test-Container.ps1 -Image %DOCKER_IMAGE%:%BUILD_NUMBER% -AppDirectory %APP_DIR% -Port 8103 -ContainerName assessment-q3-%BUILD_NUMBER%'
             }
         }
-
-        // Stage 2: Build Docker Image
-        stage('Stage 2: Build Docker Image') {
+        stage('Push Image') {
             steps {
-                echo '=== STAGE 2: Building Docker image for Placement Portal ==='
-                dir('q3-placement-portal') {
-                    sh "docker build -t ${DOCKER_HUB_REPO}:${IMAGE_TAG} ."
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat '''@echo off
+echo %DOCKER_PASS%|docker login --username %DOCKER_USER% --password-stdin
+exit /b %ERRORLEVEL%
+'''
+                    bat '''@echo off
+docker push %DOCKER_IMAGE%:%BUILD_NUMBER%
+if errorlevel 1 exit /b 1
+docker push %DOCKER_IMAGE%:latest
+exit /b %ERRORLEVEL%
+'''
                 }
             }
         }
-
-        // Stage 3: Test Application
-        stage('Stage 3: Test Application') {
+        stage('Deploy to Kubernetes') {
             steps {
-                echo '=== STAGE 3: Verifying Docker image configuration and Nginx syntax ==='
-                sh "docker run --rm ${DOCKER_HUB_REPO}:${IMAGE_TAG} nginx -t"
-            }
-        }
-
-        // Stage 4: Push Image
-        stage('Stage 4: Push Image to Docker Hub') {
-            steps {
-                echo '=== STAGE 4: Authenticating with Docker Hub & Pushing Image ==='
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh "docker push ${DOCKER_HUB_REPO}:${IMAGE_TAG}"
+                withCredentials([file(credentialsId: 'kuberconfig', variable: 'KUBECONFIG')]) {
+                    bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Deploy.ps1 -Image %DOCKER_IMAGE%:%BUILD_NUMBER% -AppDirectory %APP_DIR% -Deployment placement-deployment -Label placement-portal -Replicas 3 -NodePort 30003'
                 }
             }
         }
-
-        // Stage 5: Deploy to Kubernetes
-        stage('Stage 5: Deploy to Kubernetes') {
+        stage('Verify NodePort') {
             steps {
-                echo '=== STAGE 5: Applying Kubernetes Deployment (3 Replicas) & NodePort Service ==='
-                dir('q3-placement-portal') {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh "kubectl rollout restart deployment/placement-deployment"
-                }
-            }
-        }
-
-        // Stage 6: Verify Deployment
-        stage('Stage 6: Verify Deployment & Pod Status') {
-            steps {
-                echo '=== STAGE 6: Verifying 3 Kubernetes Pods and NodePort Service ==='
-                sh 'kubectl rollout status deployment/placement-deployment'
-                sh 'kubectl get pods -l app=placement-portal'
-                sh 'kubectl get svc placement-service'
+                bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Test-Page.ps1 -Url http://localhost:30003 -AppDirectory %APP_DIR%'
+                archiveArtifacts artifacts: 'evidence/*', fingerprint: true
             }
         }
     }
-
-    post {
-        success {
-            echo '✅ CI/CD Pipeline completed successfully! Application updated on Kubernetes.'
-        }
-        failure {
-            echo '❌ CI/CD Pipeline failed. Check build logs for details.'
-        }
-    }
+    post { always { bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Cleanup.ps1' } }
 }

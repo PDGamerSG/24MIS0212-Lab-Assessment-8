@@ -1,63 +1,55 @@
 pipeline {
     agent any
-
+    options { disableConcurrentBuilds(); skipDefaultCheckout(); timeout(time: 20, unit: 'MINUTES'); buildDiscarder(logRotator(numToKeepStr: '10')) }
+    triggers { pollSCM('H/2 * * * *') }
     environment {
-        IMAGE_NAME = 'pdgamersg/student-feedback'
-        IMAGE_TAG = 'v1' // Set to 'v2' when updating application
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+        DOCKER_IMAGE = 'pdgamersg/student-feedback'
+        APP_DIR = 'q2-student-feedback'
+        DOCKER_HOST = 'npipe:////./pipe/dockerDesktopLinuxEngine'
+        DOCKER_CONFIG = "${WORKSPACE}\\.docker-build-${BUILD_NUMBER}"
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\Git\\cmd;${env.PATH}"
     }
-
     stages {
-        stage('Checkout Source Code') {
-            steps {
-                echo 'Cloning code from repository...'
-                checkout scm
-            }
+        stage('Clone Code') {
+            steps { git branch: 'main', url: 'https://github.com/PDGamerSG/24MIS0212-Lab-Assessment-8.git' }
         }
-
         stage('Build Docker Image') {
-            steps {
-                dir('q2-student-feedback') {
-                    echo "Building Docker Image: ${IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                }
-            }
+            steps { bat 'docker build -t %DOCKER_IMAGE%:%BUILD_NUMBER% -t %DOCKER_IMAGE%:latest %APP_DIR%' }
         }
-
         stage('Test Application') {
             steps {
-                echo 'Testing Docker container...'
-                sh "docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} nginx -t"
+                bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Test-Container.ps1 -Image %DOCKER_IMAGE%:%BUILD_NUMBER% -AppDirectory %APP_DIR% -Port 8102 -ContainerName assessment-q2-%BUILD_NUMBER%'
             }
         }
-
-        stage('Push Image to Docker Hub') {
+        stage('Push Image') {
             steps {
-                echo 'Pushing image to Docker Hub...'
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat '''@echo off
+echo %DOCKER_PASS%|docker login --username %DOCKER_USER% --password-stdin
+exit /b %ERRORLEVEL%
+'''
+                    bat '''@echo off
+docker push %DOCKER_IMAGE%:%BUILD_NUMBER%
+if errorlevel 1 exit /b 1
+docker push %DOCKER_IMAGE%:latest
+exit /b %ERRORLEVEL%
+'''
                 }
             }
         }
-
-        stage('Deploy / Rolling Update to Kubernetes') {
+        stage('Deploy to Kubernetes') {
             steps {
-                echo 'Applying Deployment with 3 Replicas...'
-                dir('q2-student-feedback') {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh "kubectl set image deployment/feedback-deployment feedback-container=${IMAGE_NAME}:${IMAGE_TAG}"
+                withCredentials([file(credentialsId: 'kuberconfig', variable: 'KUBECONFIG')]) {
+                    bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Deploy.ps1 -Image %DOCKER_IMAGE%:%BUILD_NUMBER% -AppDirectory %APP_DIR% -Deployment feedback-deployment -Label feedback-app -Replicas 3 -NodePort 30002'
                 }
             }
         }
-
-        stage('Verify 3 Replicas Status') {
+        stage('Verify NodePort') {
             steps {
-                echo 'Verifying deployment rollout status and 3 running pods...'
-                sh 'kubectl rollout status deployment/feedback-deployment'
-                sh 'kubectl get pods -l app=feedback-app'
-                sh 'kubectl get svc feedback-service'
+                bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Test-Page.ps1 -Url http://localhost:30002 -AppDirectory %APP_DIR%'
+                archiveArtifacts artifacts: 'evidence/*', fingerprint: true
             }
         }
     }
+    post { always { bat 'powershell -NoProfile -ExecutionPolicy Bypass -File ci/Cleanup.ps1' } }
 }

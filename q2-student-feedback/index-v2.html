@@ -1,285 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Feedback Portal (v2.0 - Updated)</title>
-    <style>
-        :root {
-            --primary-color: #0d9488;
-            --primary-dark: #0f766e;
-            --accent-gold: #f59e0b;
-            --bg-color: #f0fdf4;
-            --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            padding: 2rem 1rem;
-        }
-
-        .container {
-            max-width: 750px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 2rem;
-            text-align: center;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-
-        .update-badge {
-            display: inline-block;
-            background: var(--accent-gold);
-            color: #78350f;
-            font-weight: 700;
-            font-size: 0.8rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            margin-top: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* NEW FEATURE: Course Rating Summary & Faculty Profile */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            padding: 1.5rem 2rem 0.5rem 2rem;
-        }
-
-        .summary-card, .faculty-card {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .card-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .rating-num {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--accent-gold);
-        }
-
-        .faculty-info {
-            font-size: 0.85rem;
-            color: #4b5563;
-            line-height: 1.4;
-        }
-
-        form {
-            padding: 1.5rem 2rem 2rem 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #374151;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .rating-group {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            padding-top: 0.5rem;
-        }
-
-        .rating-option {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            cursor: pointer;
-        }
-
-        /* NEW FEATURE: Thank you banner message on submission */
-        .thank-you-banner {
-            display: none;
-            background: #dcfce7;
-            border: 1px solid #86efac;
-            color: #166534;
-            padding: 1rem;
-            margin: 1rem 2rem;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.9rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 0.5rem;
-        }
-
-        button:hover {
-            background: var(--primary-dark);
-        }
-
-        footer {
-            text-align: center;
-            padding: 1rem;
-            background: #f9fafb;
-            color: #6b7280;
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border-color);
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <div class="header">
-            <h1>Student Course Feedback System</h1>
-            <p>Help us improve your learning experience by providing feedback</p>
-            <span class="update-badge">✨ Version 2.0 - Updated with Rating Summary</span>
-        </div>
-
-        <!-- NEW FEATURE 1 & 2: Course Rating Summary & Faculty Profile -->
-        <div class="feature-grid">
-            <div class="summary-card">
-                <div class="card-title">⭐ Average Course Rating</div>
-                <div class="rating-num">4.8 / 5.0</div>
-                <div style="font-size:0.8rem; color:#6b7280;">Based on 142 student reviews</div>
-            </div>
-            <div class="faculty-card">
-                <div class="card-title">👨‍🏫 Instructor Profile</div>
-                <div class="faculty-info">
-                    <strong>Dr. A. Professor</strong><br>
-                    Senior Associate Professor, SCOPE<br>
-                    Specialization: Agile & DevOps
-                </div>
-            </div>
-        </div>
-
-        <!-- NEW FEATURE 3: Thank You Message Modal/Banner -->
-        <div id="thankYouBanner" class="thank-you-banner">
-            🎉 Thank you for submitting your feedback! Your response has been recorded.
-        </div>
-
-        <form id="feedbackForm" onsubmit="document.getElementById('thankYouBanner').style.display='block'; alert('Feedback Received! Thank you.'); return false;">
-            <div class="row">
-                <div class="form-group">
-                    <label for="studentName">Student Name</label>
-                    <input type="text" id="studentName" value="Pallab Das" required>
-                </div>
-                <div class="form-group">
-                    <label for="regNo">Register Number</label>
-                    <input type="text" id="regNo" value="24MIS0212" required>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group">
-                    <label for="department">Department</label>
-                    <select id="department" required>
-                        <option value="SCOPE" selected>SCOPE (Computer Science)</option>
-                        <option value="SENSE">SENSE (Electronics)</option>
-                        <option value="SELECT">SELECT (Electrical)</option>
-                        <option value="SMEC">SMEC (Mechanical)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="courseName">Course Name</label>
-                    <input type="text" id="courseName" value="Agile Software Development" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="facultyName">Faculty Name</label>
-                <input type="text" id="facultyName" value="Dr. A. Professor" required>
-            </div>
-
-            <div class="form-group">
-                <label>Overall Course Rating (1 to 5 Stars)</label>
-                <div class="rating-group">
-                    <label class="rating-option"><input type="radio" name="rating" value="1"> 1 ★</label>
-                    <label class="rating-option"><input type="radio" name="rating" value="2"> 2 ★★</label>
-                    <label class="rating-option"><input type="radio" name="rating" value="3"> 3 ★★★</label>
-                    <label class="rating-option"><input type="radio" name="rating" value="4"> 4 ★★★★</label>
-                    <label class="rating-option"><input type="radio" name="rating" value="5" checked> 5 ★★★★★</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="comments">Detailed Feedback / Comments</label>
-                <textarea id="comments" rows="3" required>Excellent teaching methodology and practical lab sessions on Kubernetes and Jenkins CI/CD pipelines!</textarea>
-            </div>
-
-            <button type="submit">Submit Feedback (v2.0)</button>
-        </form>
-
-        <footer>
-            Version 2.0.0 (Updated) | Deployed with Docker & Kubernetes
-        </footer>
-    </div>
-
-</body>
-</html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Student Feedback</title><style>body{font-family:Arial,sans-serif;max-width:850px;margin:30px auto;padding:0 18px;line-height:1.5;color:#222}h1{color:#17456b}article,fieldset{border:1px solid #ccc;padding:16px;margin:18px 0}label{display:block;margin-top:12px}input:not([type=radio]),select,textarea{box-sizing:border-box;width:100%;max-width:500px;padding:8px}button{padding:10px 18px;margin-top:14px;background:#17456b;color:white;border:0;cursor:pointer}a{color:#17456b}.rating label{display:inline-block;margin-right:16px}footer{border-top:1px solid #ccc;margin-top:25px;padding-top:12px}.note{color:#555;font-size:.9rem}:focus-visible{outline:3px solid #d88a00;outline-offset:3px}</style></head>
+<body><main><h1>Student Feedback</h1><p><strong>College:</strong> Vellore Institute of Technology<br><strong>Department:</strong> School of Computer Science &amp; Engineering (SCOPE)</p><p class="note">Demo: feedback is saved only in this browser. It is not sent to a faculty member.</p>
+<form id="feedbackForm">
+<label for="courseName">Course name</label><input id="courseName" name="courseName" required maxlength="100">
+<label for="facultyName">Faculty name</label><input id="facultyName" name="facultyName" required maxlength="100">
+<label for="studentName">Student name</label><input id="studentName" name="studentName" required maxlength="100">
+<label for="regNo">Register number</label><input id="regNo" name="regNo" required maxlength="30">
+<label for="department">Department</label><select id="department" name="department" required><option value="">Select department</option><option>SCOPE</option><option>SENSE</option><option>SELECT</option><option>SMEC</option></select>
+<fieldset class="rating"><legend>Rating (1 = Poor, 5 = Excellent)</legend><label><input type="radio" name="rating" value="1" required> 1</label><label><input type="radio" name="rating" value="2" required> 2</label><label><input type="radio" name="rating" value="3" required> 3</label><label><input type="radio" name="rating" value="4" required> 4</label><label><input type="radio" name="rating" value="5" required> 5</label></fieldset>
+<label for="comments">Feedback / comments</label><textarea id="comments" name="comments" rows="4" required maxlength="2000"></textarea>
+<button type="submit">Submit Feedback</button></form>
+<p id="status" role="status" aria-live="polite"></p><section aria-labelledby="summaryHeading"><h2 id="summaryHeading">Course rating summary</h2><p id="ratingSummary" aria-live="polite"></p></section><footer><strong>Contact:</strong> Department office &middot; <a href="mailto:scope@example.com">scope@example.com</a><p class="note">Academic lab demonstration. Notices, jobs, and contact details are sample data.</p></footer></main><script>const storageKey = 'assessment8-feedback';
+let feedback = [];
+let storageAvailable = true;
+try { const saved = JSON.parse(localStorage.getItem(storageKey) || '[]'); if (Array.isArray(saved)) feedback = saved.filter(item => Number(item.rating) >= 1 && Number(item.rating) <= 5); } catch { storageAvailable = false; }
+function showSummary() {
+ const summary = document.getElementById('ratingSummary');
+ if (!feedback.length) { summary.textContent = 'No feedback yet in this browser.'; return; }
+ const average = feedback.reduce((total,item) => total + Number(item.rating), 0) / feedback.length;
+ summary.textContent = feedback.length + ' response(s) in this browser. Average course rating: ' + average.toFixed(1) + '/5.';
+}
+showSummary();
+document.getElementById('feedbackForm').addEventListener('submit', function(event) {
+ event.preventDefault();
+ if (!this.reportValidity()) return;
+ const record = Object.fromEntries(new FormData(this)); record.rating = Number(record.rating); record.date = new Date().toISOString();
+ const next = feedback.concat(record);
+ try { if (!storageAvailable) throw new Error('Storage unavailable'); localStorage.setItem(storageKey, JSON.stringify(next)); }
+ catch { document.getElementById('status').textContent = 'Could not save feedback. Enable browser storage and try again.'; return; }
+ feedback = next;
+ document.getElementById('status').textContent = 'Thank you! Your feedback has been saved in this browser.';
+ this.reset();
+ showSummary();
+});</script></body></html>

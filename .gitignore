@@ -1,0 +1,4 @@
+.docker-build-*/
+*.tar
+__pycache__/
+evidence/screenshots/

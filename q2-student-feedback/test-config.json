@@ -1,0 +1,13 @@
+{
+  "tokens": [
+    "Student Feedback",
+    "studentName",
+    "regNo",
+    "department",
+    "courseName",
+    "facultyName",
+    "rating",
+    "comments",
+    "Submit Feedback"
+  ]
+}
